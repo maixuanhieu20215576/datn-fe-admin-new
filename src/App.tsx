@@ -19,6 +19,7 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import ApplicationForms from "./pages/Forms/ApplicationForms";
+import CreateClass from "./pages/Class/CreateClass";
 
 export default function App() {
   return (
@@ -52,6 +53,8 @@ export default function App() {
             {/* Charts */}
             <Route path="/line-chart" element={<LineChart />} />
             <Route path="/bar-chart" element={<BarChart />} />
+
+            <Route path="/create-class" element={<CreateClass/>} />
           </Route>
 
           {/* Auth Layout */}

@@ -55,6 +55,11 @@ const Input: FC<InputProps> = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onFocus={(e) => {
+          if (type === "date" || type === "time") {
+            (e.target as HTMLInputElement).showPicker();
+          }
+        }}
         min={min}
         max={max}
         step={step}

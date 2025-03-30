@@ -7,6 +7,7 @@ import {
   GridIcon,
   HorizontaLDots,
   ListIcon,
+  PencilIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -39,7 +40,13 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     subItems: [{ name: "Đơn đăng ký giảng dạy", path: "/application-forms", pro: false }],
   },
-
+  {
+    icon: <PencilIcon />,
+    name: "Lớp học",
+    subItems: [
+      { name: "Tạo lớp học", path: "/create-class" },
+    ],
+  },
   /*{
     name: "Pages",
     icon: <PageIcon />,
