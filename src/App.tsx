@@ -20,6 +20,8 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import ApplicationForms from "./pages/Forms/ApplicationForms";
 import CreateClass from "./pages/Class/CreateClass";
+import ClassManagement from "./pages/Class/ClassManagement";
+import ClassDetail from "./pages/Class/ClassDetail";
 
 export default function App() {
   return (
@@ -54,7 +56,9 @@ export default function App() {
             <Route path="/line-chart" element={<LineChart />} />
             <Route path="/bar-chart" element={<BarChart />} />
 
-            <Route path="/create-class" element={<CreateClass/>} />
+            <Route path="/create-class" element={<CreateClass />} />
+            <Route path="/class-management" element={<ClassManagement />} />
+            <Route path="/class-detail/:classId" element={<ClassDetail />} />
           </Route>
 
           {/* Auth Layout */}

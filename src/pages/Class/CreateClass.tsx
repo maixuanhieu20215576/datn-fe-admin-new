@@ -9,6 +9,9 @@ import axios from "axios";
 import Input from "../../components/form/input/InputField";
 import Radio from "../../components/form/input/Radio";
 import Alert from "../../components/ui/alert/Alert";
+import FileInput from "../../components/form/input/FileInput";
+import imageCompression from "browser-image-compression";
+
 type Teacher = {
   _id: string;
   fullName: string;
@@ -31,6 +34,8 @@ export default function CreateClass() {
     useState<string>("");
   const [isError, setIsError] = useState<boolean | null>(null);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [thumbnail, setthumbnail] = useState<File>();
+  const [previewthumbnail, setPreviewthumbnail] = useState<string>();
 
   const teachingLanguageOptions = [
     { value: "English", label: "Tiếng Anh" },
@@ -119,73 +124,72 @@ export default function CreateClass() {
 
   const createClass = async () => {
     let response;
-
+  
+    const formData = new FormData();
+    formData.append("className", className);
+    formData.append("teachingLanguage", teachingLanguage);
+    formData.append("teacherName", choosenTeacher?.fullName || "");
+    formData.append("teacherId", choosenTeacher?._id || "");
+    formData.append("maxStudent", String(maxStudent || 0));
+    formData.append("classUrl", classUrl);
+    formData.append("price", String(price));
+    formData.append("priceType", priceType);
+    if (thumbnail) {
+      formData.append("thumbnail", thumbnail);
+    }
+  
     if (classType === "singleClass") {
+      formData.append("classType", "singleClass");
+      formData.append("timeFrom", timeFrom || "");
+      formData.append("timeTo", timeTo || "");
+      formData.append("schedule", JSON.stringify(dayForSingleClass));
+  
       try {
         response = await axios.post(
           `${import.meta.env.VITE_API_URL}/admin/create-class`,
+          formData,
           {
-            className,
-            teachingLanguage,
-            teacherName: choosenTeacher?.fullName,
-            teacherId: choosenTeacher?._id,
-            maxStudent,
-            classUrl,
-            classType: "singleClass",
-            timeFrom,
-            timeTo,
-            schedule: dayForSingleClass,
-            price,
-            priceType,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
-        if (response.status === 200) {
-          setIsError(false);
-        } else {
-          setIsError(true);
-        }
+        setIsError(response.status !== 200);
       } catch (error) {
         console.error("Error creating single class:", error);
         setIsError(true);
       }
     }
-
+  
     if (classType === "classByWeeks") {
+      formData.append("classType", "classByWeeks");
+      formData.append("schedule", JSON.stringify(rows));
+      formData.append("startDayForClassByWeeks", startDayForClassByWeeks);
+      formData.append("endDayForClassByWeeks", endDayForClassByWeeks);
+  
       try {
         response = await axios.post(
           `${import.meta.env.VITE_API_URL}/admin/create-class`,
+          formData,
           {
-            className,
-            teachingLanguage,
-            teacherName: choosenTeacher?.fullName,
-            teacherId: choosenTeacher?._id,
-            maxStudent,
-            classUrl,
-            classType: "classByWeeks",
-            schedule: rows,
-            startDayForClassByWeeks,
-            endDayForClassByWeeks,
-            price,
-            priceType,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
-        if (response.status === 200) {
-          setIsError(false);
-        } else {
-          setIsError(true);
-        }
+        setIsError(response.status !== 200);
       } catch (error) {
         console.error("Error creating class by weeks:", error);
         setIsError(true);
       }
     }
-
+  
     // Reset alert after 3 seconds
     setTimeout(() => {
       setIsError(null);
     }, 3000);
   };
-
+  
   useEffect(() => {
     if (isError !== null) {
       setShowAlert(true);
@@ -194,6 +198,27 @@ export default function CreateClass() {
       return () => clearTimeout(timer); // cleanup
     }
   }, [isError]);
+
+  const handlethumbnailChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const options = {
+        maxSizeMB: 1, // Giảm xuống dưới 1MB
+        maxWidthOrHeight: 1024, // Giới hạn chiều rộng/cao
+        useWebWorker: true,
+      };
+      try {
+        const compressedFile = await imageCompression(file, options);
+        setthumbnail(compressedFile); // Lưu file đã nén
+        const previewURL = URL.createObjectURL(compressedFile);
+        setPreviewthumbnail(previewURL); // Xem trước
+      } catch (error) {
+        console.log("Lỗi khi nén ảnh:", error);
+      }
+    }
+  };
 
   return (
     <div>
@@ -584,6 +609,23 @@ export default function CreateClass() {
                       label="Tính theo buổi"
                     />
                   </div>
+                </div>
+              </div>
+              <div className="col-span-2 lg:col-span-1 pt-5">
+                <div>
+                  <Label>Thumbnail lớp học</Label>
+                  <div className="w-30 h-20 overflow-hidden border border-gray-200 rounded-lg dark:border-gray-800">
+                    <img
+                      src={previewthumbnail}
+                      alt="user"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <FileInput
+                    className="custom-class"
+                    onChange={handlethumbnailChange}
+                  />
                 </div>
               </div>
             </div>

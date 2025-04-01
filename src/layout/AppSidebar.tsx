@@ -45,6 +45,7 @@ const navItems: NavItem[] = [
     name: "Lớp học",
     subItems: [
       { name: "Tạo lớp học", path: "/create-class" },
+      { name: "Quản lý lớp học", path: "/class-management" },
     ],
   },
   /*{
