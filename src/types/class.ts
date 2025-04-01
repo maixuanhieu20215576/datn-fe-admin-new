@@ -1,5 +1,3 @@
-import { constants } from "../constant";
-
 export interface ISchedule {
   date?: string;
   timeFrom: string;
@@ -14,15 +12,14 @@ export interface IClass {
   maxStudent?: number;
   currentStudent: number;
   language: string;
-  level?: typeof constants.courseLevel[number];
   price: number;
-  priceType: typeof constants.priceType[number];
+  priceType: "byDay" | "byCourse";
   status: "closed" | "open";
   schedule: ISchedule[];
   classUrl: string;
-  classType: typeof constants.classType[number];
   thumbnail?: string;
   stringForSearching?: string;
   createdAt?: Date;
   updatedAt?: Date;
-} 
+  classType: "singleClass" | "classByWeeks";
+}

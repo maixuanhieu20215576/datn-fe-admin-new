@@ -1,6 +1,6 @@
 import PageMeta from "../../components/common/PageMeta";
 import { FaUser, FaMoneyBillAlt, FaChartArea } from "react-icons/fa";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { constants } from "../../components/common/constant";
 import { motion } from "framer-motion"; // Added for animations
@@ -69,9 +69,6 @@ export default function ClassDetail() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [scheduleToDelete, setScheduleToDelete] = useState<number | null>(null);
   const [teacherList, setTeacherList] = useState<ITeacher[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [showTeacherDropdown, setShowTeacherDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isDateInPast = (dateString: string | undefined) => {
     if (!dateString) return false;
@@ -144,20 +141,7 @@ export default function ClassDetail() {
     };
 
     fetchTeacherList();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowTeacherDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  }, [classData?.language]);
 
   if (loading) {
     return (
