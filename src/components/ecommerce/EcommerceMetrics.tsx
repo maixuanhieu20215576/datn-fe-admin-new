@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -5,8 +6,24 @@ import {
   GroupIcon,
 } from "../../icons";
 import Badge from "../ui/badge/Badge";
-
+import axios from "axios";
+import { formatNumber } from "../common/utils";
 export default function EcommerceMetrics() {
+  const [orderStatistics, setOrderStatistics] = useState({
+    totalStudents: 0,
+    comparedTotalStudents: 0,
+    totalRevenue: 0,
+    comparedTotalRevenue: 0,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/get-order-statistics`);
+      setOrderStatistics(response.data);
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
       {/* <!-- Metric Item Start --> */}
@@ -18,16 +35,15 @@ export default function EcommerceMetrics() {
         <div className="flex items-end justify-between mt-5">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Customers
+              Học viên mới
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              3,782
+              {formatNumber(orderStatistics.totalStudents)}
             </h4>
           </div>
-          <Badge color="success">
-            <ArrowUpIcon />
-            11.01%
-          </Badge>
+          <Badge color={orderStatistics.comparedTotalStudents > 0 ? "success" : "error"}>
+            {orderStatistics.comparedTotalStudents > 0 ? <ArrowUpIcon /> : <ArrowDownIcon />}
+            {formatNumber((orderStatistics.comparedTotalStudents))}%          </Badge>
         </div>
       </div>
       {/* <!-- Metric Item End --> */}
@@ -40,16 +56,16 @@ export default function EcommerceMetrics() {
         <div className="flex items-end justify-between mt-5">
           <div>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Orders
+              Doanh thu
             </span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              5,359
+              {formatNumber(orderStatistics.totalRevenue)}
             </h4>
           </div>
 
-          <Badge color="error">
-            <ArrowDownIcon />
-            9.05%
+          <Badge color={orderStatistics.comparedTotalRevenue > 0 ? "success" : "error"}>
+            {orderStatistics.comparedTotalRevenue > 0 ? <ArrowUpIcon /> : <ArrowDownIcon />}  
+            {formatNumber(orderStatistics.comparedTotalRevenue)}%
           </Badge>
         </div>
       </div>

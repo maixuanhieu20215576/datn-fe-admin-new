@@ -15,4 +15,12 @@ const getUserIdFromLocalStorage = () => {
   return user._id;
 };
 
-export { useDeviceQueries, getUserIdFromLocalStorage };
+const getUserRoleFromLocalStorage = () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  return user.role;
+};
+
+const formatNumber = (number: number) => {
+  return number.toLocaleString("vi-VN");
+};
+export { useDeviceQueries, getUserIdFromLocalStorage, getUserRoleFromLocalStorage, formatNumber };

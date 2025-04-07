@@ -22,15 +22,17 @@ import ApplicationForms from "./pages/Forms/ApplicationForms";
 import CreateClass from "./pages/Class/CreateClass";
 import ClassManagement from "./pages/Class/ClassManagement";
 import ClassDetail from "./pages/Class/ClassDetail";
+import { getUserRoleFromLocalStorage } from "./components/common/utils";
 
 export default function App() {
+  const userRole = getUserRoleFromLocalStorage();
   return (
     <>
       <Router>
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
+          <Route element={userRole === "admin" ? <AppLayout /> : <SignIn />}>
             <Route index path="/" element={<Home />} />
 
             {/* Others Page */}

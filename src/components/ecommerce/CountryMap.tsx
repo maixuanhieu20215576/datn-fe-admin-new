@@ -20,35 +20,56 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
       }}
       markersSelectable={true}
       markers={[
+
         {
-          latLng: [37.2580397, -104.657039],
-          name: "United States",
-          style: {
-            fill: "#465FFF",
-            borderWidth: 1,
-            borderColor: "white",
-            stroke: "#383f47",
-          },
-        },
-        {
-          latLng: [20.7504374, 73.7276105],
-          name: "India",
+          latLng: [46.227638, 2.213749],
+          name: "France",
           style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
         },
         {
-          latLng: [53.613, -11.6368],
-          name: "United Kingdom",
+          latLng: [51.165691, 10.451526],
+          name: "Germany",
           style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
         },
         {
-          latLng: [-25.0304388, 115.2092761],
-          name: "Sweden",
-          style: {
-            fill: "#465FFF",
-            borderWidth: 1,
-            borderColor: "white",
-            strokeOpacity: 0,
-          },
+          latLng: [35.907757, 127.766922],
+          name: "Korea",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
+        },
+        {
+          latLng: [36.204824, 138.252924],
+          name: "Japan",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
+        },
+        {
+          latLng: [35.86166, 104.195397],
+          name: "China",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
+        },
+        {
+          latLng: [52.355518, -1.17432],
+          name: "England",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
+        },
+        {
+          latLng: [23.885942, 45.079162],
+          name: "Arab",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
+        },
+        {
+          latLng: [51.919438, 19.145136],
+          name: "Poland",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
+        },
+        {
+          latLng: [61.52401, 105.318756],
+          name: "Russia",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
+        },
+        {
+          latLng: [40.463667, -3.74922],
+          name: "Spain",
+          style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
         },
       ]}
       zoomOnScroll={false}

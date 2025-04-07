@@ -28,14 +28,14 @@ export default function SignInForm() {
         }
       );
 
-      if (loginResponse.status === 200) {
-        const { accessToken, user } = loginResponse.data;
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("user", JSON.stringify(user));
-        if (user.role === "admin") {
+      if (loginResponse.status === 200 && loginResponse.data.user.role === "admin") {
+        setTimeout(() => {
+          const { accessToken, user } = loginResponse.data;
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("user", JSON.stringify(user));
           navigate("/");
-        } else setError("Sai mật khẩu! Vui lòng thử lại nhé");
-      }
+        }, 1000);
+      } else setError("Sai mật khẩu! Vui lòng thử lại nhé");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       console.log(error);
