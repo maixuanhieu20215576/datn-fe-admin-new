@@ -21,7 +21,7 @@ export default function UserMetaCard() {
   const [facebook, setFacebook] = useState<string>(user?.facebook || "*");
   const [linkedin, setLinkedin] = useState<string>(user?.linkedin || "*");
   const [avatar, setAvatar] = useState<File>();
-  const [previewAvatar, setPreviewAvatar] = useState<string>(user?.avatar);
+  const [previewAvatar, setPreviewAvatar] = useState<string>(user?.avatar || "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg");
 
   interface FileInputProps {
     className?: string;

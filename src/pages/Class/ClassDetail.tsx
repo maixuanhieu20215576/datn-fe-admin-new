@@ -12,6 +12,7 @@ import { Modal } from "../../components/ui/modal";
 import axios from "axios";
 import SelectUsingReactSelect from "../../components/form/form-elements/ReactSelect";
 import Alert from "../../components/ui/alert/Alert";
+import Badge from "../../components/ui/badge/Badge";
 
 // Interfaces remain unchanged
 export interface ISchedule {
@@ -316,7 +317,7 @@ export default function ClassDetail() {
             <table className="table w-full">
               <thead>
                 <tr className="bg-base-200 text-gray-700 dark:text-gray-300">
-                  {["Họ tên", "Email", "Số điện thoại", "Trạng thái thanh toán", "Hành động"].map((header, index) => (
+                  {["Họ tên", "Email", "Số điện thoại", "Trạng thái thanh toán"].map((header, index) => (
                     <th key={index} className="px-4 py-3 text-sm font-semibold text-left">{header}</th>
                   ))}
                 </tr>
@@ -330,19 +331,15 @@ export default function ClassDetail() {
                     transition={{ delay: index * 0.1 }}
                     className="hover:bg-base-200 dark:hover:bg-base-300 transition-colors"
                   >
-                    <td className="px-4 py-3 font-medium">{student.studentName}</td>
-                    <td className="px-4 py-3">{student.email}</td>
-                    <td className="px-4 py-3">{student.phoneNumber}</td>
+                    <td className="px-4 py-3 font-medium dark:text-gray-300">{student.studentName}</td>
+                    <td className="px-4 py-3 dark:text-gray-300">{student.email}</td>
+                    <td className="px-4 py-3 dark:text-gray-300">{student.phoneNumber}</td>
                     <td className="px-4 py-3">
-                      <span className={`badge ${student.paymentStatus === "paid" ? "badge-success" : "badge-error"} animate-pulse`}>
-                        {student.paymentStatus === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}
-                      </span>
+                      <Badge color={student.paymentStatus === "Success" ? "success" : "error"} >
+                        {student.paymentStatus === "Success" ? "Đã thanh toán" : "Chưa thanh toán"}
+                      </Badge>
                     </td>
-                    <td className="px-4 py-3">
-                      <button className="btn btn-sm btn-outline btn-primary hover:btn-primary transform hover:scale-105 transition-all">
-                        Chi tiết
-                      </button>
-                    </td>
+
                   </motion.tr>
                 ))}
               </tbody>

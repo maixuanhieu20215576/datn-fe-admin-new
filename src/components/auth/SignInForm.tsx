@@ -7,7 +7,7 @@ import Button from "../ui/button/Button";
 import axios from "axios";
 import { useNavigate } from "react-router";
 
-export default function SignInForm() {
+export default function SignInForm({ setUserId }: { setUserId: (userId: string) => void }) {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -33,6 +33,7 @@ export default function SignInForm() {
           const { accessToken, user } = loginResponse.data;
           localStorage.setItem("accessToken", accessToken);
           localStorage.setItem("user", JSON.stringify(user));
+          setUserId(user._id);
           navigate("/");
         }, 1000);
       } else setError("Sai mật khẩu! Vui lòng thử lại nhé");
