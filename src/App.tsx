@@ -22,7 +22,7 @@ import ApplicationForms from "./pages/Forms/ApplicationForms";
 import CreateClass from "./pages/Class/CreateClass";
 import ClassManagement from "./pages/Class/ClassManagement";
 import ClassDetail from "./pages/Class/ClassDetail";
-import { getUserRoleFromLocalStorage } from "./components/common/utils";
+import { useState } from "react";
 
 export default function App() {
   const [userId, setUserId] = useState(() => {
