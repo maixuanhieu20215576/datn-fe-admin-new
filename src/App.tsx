@@ -23,6 +23,7 @@ import CreateClass from "./pages/Class/CreateClass";
 import ClassManagement from "./pages/Class/ClassManagement";
 import ClassDetail from "./pages/Class/ClassDetail";
 import { useState } from "react";
+import PaymentManagement from "./pages/TeacherManagement.tsx/PaymentMangement";
 
 export default function App() {
   const [userId, setUserId] = useState(() => {
@@ -64,6 +65,7 @@ export default function App() {
             <Route path="/create-class" element={<CreateClass />} />
             <Route path="/class-management" element={<ClassManagement />} />
             <Route path="/class-detail/:classId" element={<ClassDetail />} />
+            <Route path="/payment-management" element={<PaymentManagement />} />
           </Route>
 
           {/* Auth Layout */}

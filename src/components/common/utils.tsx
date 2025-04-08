@@ -20,7 +20,12 @@ const getUserRoleFromLocalStorage = () => {
   return user.role;
 };
 
+const getUserNameFromLocalStorage = () => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  return user.fullName;
+};
+
 const formatNumber = (number: number) => {
   return number.toLocaleString("vi-VN");
 };
-export { useDeviceQueries, getUserIdFromLocalStorage, getUserRoleFromLocalStorage, formatNumber };
+export { useDeviceQueries, getUserIdFromLocalStorage, getUserRoleFromLocalStorage, formatNumber, getUserNameFromLocalStorage };

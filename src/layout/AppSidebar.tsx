@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router";
 // Assume these icons are imported from an icon library
 import {
   ChevronDownIcon,
+  DollarLineIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
@@ -39,6 +40,11 @@ const navItems: NavItem[] = [
     name: "Quản lý đơn từ",
     icon: <ListIcon />,
     subItems: [{ name: "Đơn đăng ký giảng dạy", path: "/application-forms", pro: false }],
+  },
+  {
+    name: "Quản lý giảng viên",
+    icon: <DollarLineIcon />,
+    subItems: [{ name: "Thanh toán lương", path: "/payment-management", pro: false }],
   },
   {
     icon: <PencilIcon />,
