@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router";
 
 // Assume these icons are imported from an icon library
 import {
+  ChatIcon,
   ChevronDownIcon,
   DollarLineIcon,
   GridIcon,
@@ -53,6 +54,11 @@ const navItems: NavItem[] = [
       { name: "Tạo lớp học", path: "/create-class" },
       { name: "Quản lý lớp học", path: "/class-management" },
     ],
+  },
+  {
+    icon: <ChatIcon />,
+    name: "Chat",
+    path: "/chat",
   },
   /*{
     name: "Pages",
