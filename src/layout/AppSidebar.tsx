@@ -6,6 +6,7 @@ import {
   ChatIcon,
   ChevronDownIcon,
   DollarLineIcon,
+  FileIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
@@ -53,6 +54,13 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Tạo lớp học", path: "/create-class" },
       { name: "Quản lý lớp học", path: "/class-management" },
+    ],
+  },
+  {
+    icon: <FileIcon />, // Có thể thay icon khác nếu muốn
+    name: "Quản lý khóa học",
+    subItems: [
+      { name: "Tạo khóa học", path: "/create-course" },
     ],
   },
   {

@@ -25,6 +25,7 @@ import ClassDetail from "./pages/Class/ClassDetail";
 import { useState } from "react";
 import PaymentManagement from "./pages/TeacherManagement.tsx/PaymentMangement";
 import Chat from "./pages/Chat";
+import CreateCourse from "./pages/CourseManagement/CreateCourse";
 
 export default function App() {
   const [userId, setUserId] = useState(() => {
@@ -37,7 +38,7 @@ export default function App() {
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={userId ? <AppLayout /> : <SignIn setUserId={setUserId}/>}>
+          <Route element={userId ? <AppLayout /> : <SignIn setUserId={setUserId} />}>
             <Route index path="/" element={<Home />} />
 
             {/* Others Page */}
@@ -67,6 +68,7 @@ export default function App() {
             <Route path="/class-management" element={<ClassManagement />} />
             <Route path="/class-detail/:classId" element={<ClassDetail />} />
             <Route path="/payment-management" element={<PaymentManagement />} />
+            <Route path='/create-course' element={<CreateCourse />} />
             <Route path="/chat" element={<Chat />} />
           </Route>
 
