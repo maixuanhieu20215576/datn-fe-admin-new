@@ -105,66 +105,61 @@ export default function CreateCourse() {
     setLectures(updatedLectures);
   };
 
-  const generatePresignedUrl = async (file: File | null) => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/s3/generate-presigned-url`,
-      {
-        fileName: file?.name,
-        fileType: file?.type, // ⚠️ Gửi đúng MIME type
-      }
-    );
-
-    return {
-      fileUrl: response.data.fileUrl,
-      uploadUrl: response.data.uploadUrl,
-    };
-  };
-
   const handleSubmit = async () => {
     try {
-      const courseData = {
-        courseName,
-        thumbnail,
-        instructor,
-        originalPrice,
-        discountedPrice,
-        language,
-        lectures,
-        thumbnailFileUrl: "",
-      };
+      const formData = new FormData();
+      console.log(thumbnail);
+      formData.append("courseName", courseName);
+      formData.append("instructor", instructor);
+      formData.append("originalPrice", originalPrice);
+      formData.append("discountedPrice", discountedPrice);
+      formData.append("language", language);
 
-      const thumbnailPresignedUrl = await generatePresignedUrl(thumbnail);
-      const thumbnailUploadUrl = thumbnailPresignedUrl.uploadUrl;
-      const thumbnailFileUrl = thumbnailPresignedUrl.fileUrl;
-      console.log(thumbnailPresignedUrl);
-      await fetch(thumbnailUploadUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": thumbnail?.type || "",
-        },
-        body: thumbnail,
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
+      }
+
+      const lecturesData = lectures.map((lecture, lectureIndex) => {
+        return {
+          name: lecture.name,
+          units: lecture.units.map((unit, unitIndex) => {
+            return {
+              title: unit.title,
+              overview: unit.overview,
+              fileFieldName: `file-${lectureIndex}-${unitIndex}`,
+            };
+          }),
+        };
       });
 
-      for (const lecture of courseData.lectures) {
-        for (const unit of lecture.units) {
-          const { fileUrl, uploadUrl } = await generatePresignedUrl(unit.file);
-          await fetch(uploadUrl, {
-            method: "PUT",
-            headers: unit.file?.type
-              ? {
-                  "Content-Type": unit.file.type,
-                }
-              : undefined,
-            body: unit.file,
-          });
-          unit.fileUrl = fileUrl;
+      formData.append("lectures", JSON.stringify(lecturesData));
+
+      // Append từng file vào FormData
+      lectures.forEach((lecture, lectureIndex) => {
+        lecture.units.forEach((unit, unitIndex) => {
+          if (unit.file) {
+            const fieldName = `file-${lectureIndex}-${unitIndex}`;
+            formData.append(fieldName, unit.file);
+          }
+        });
+      });
+
+      // Gửi về backend
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/course/create-course`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-      }
-      courseData.thumbnailFileUrl = thumbnailFileUrl;
-      console.log(courseData);
-      alert("Khóa học đã được tạo!");
-    } catch (err) {
-      alert(`Lỗi ${err}`);
+      );
+
+      console.log("✅ Khóa học đã được tạo:", response.data);
+      alert("Tạo khóa học thành công!");
+    } catch (error) {
+      console.error("❌ Lỗi khi tạo khóa học:", error);
+      alert("Đã xảy ra lỗi khi tạo khóa học!");
     }
   };
 
