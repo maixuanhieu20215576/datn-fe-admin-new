@@ -157,7 +157,7 @@ export default function PaymentManagement() {
                                         <TableCell className="text-center text-gray-500 dark:text-gray-400"><Badge color={teacher.status === "paid" ? "success" : "error"}>{teacher.status === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}</Badge></TableCell>
                                         <TableCell className="text-center text-gray-500 dark:text-gray-400">{teacher.month}/{teacher.year}</TableCell>
                                         <TableCell className="text-center text-gray-500 dark:text-gray-400">
-                                            {teacher.status === "unpaid" && <Button variant="primary" className="w-2/3 h-10" onClick={() => handlePaySalary(teacher.teacherId._id, teacher.salary, teacher.month, teacher.year, teacher)}>
+                                            {teacher.status === "unpaid" && <Button disabled={teacher.month >= new Date().getMonth() + 1} variant="primary" className="w-2/3 h-10" onClick={() => handlePaySalary(teacher.teacherId._id, teacher.salary, teacher.month, teacher.year, teacher)}>
                                                 Thanh toán
                                             </Button>}
                                         </TableCell>

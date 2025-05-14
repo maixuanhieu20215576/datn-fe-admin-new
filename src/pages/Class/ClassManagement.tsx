@@ -5,6 +5,8 @@ import axios from "axios";
 import { constants } from "../../components/common/constant";
 import Pagination from "../../components/ui/pagination/Pagination";
 import { useNavigate } from "react-router";
+import Input from "../../components/form/input/InputField";
+import Button from "../../components/ui/button/Button";
 
 const ClassCard = ({
   image,
@@ -25,7 +27,7 @@ const ClassCard = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center bg-white rounded-xl shadow p-4 mb-4">
+    <div className="flex items-center bg-white rounded-xl shadow p-4 mb-4 dark:bg-gray-800">
       <img
         src={image}
         alt="class"
@@ -33,8 +35,8 @@ const ClassCard = ({
       />
 
       <div className="flex-1">
-        <h2 className="text-lg font-semibold mb-1">{title}</h2>
-        <div className="text-sm text-gray-500 flex items-center gap-2 mb-1">
+        <h2 className="text-lg font-semibold mb-1 dark:text-white">{title}</h2>
+        <div className="text-sm text-gray-500 dark:text-gray-300 flex items-center gap-2 mb-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -51,7 +53,7 @@ const ClassCard = ({
           </svg>
           {teacherName}{" "}
         </div>
-        <div className="text-sm text-gray-500 flex items-center gap-2 mb-2">
+        <div className="text-sm text-gray-500 flex items-center dark:text-gray-300 gap-2 mb-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -68,7 +70,7 @@ const ClassCard = ({
           </svg>
           {language}
         </div>
-        <div className="text-sm text-gray-500 flex items-center gap-2 mb-2">
+        <div className="text-sm text-gray-500 flex items-center gap-2 mb-2 dark:text-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -85,12 +87,12 @@ const ClassCard = ({
           </svg>
           Số học viên đã đăng ký: {currentStudent}
         </div>
-        <button
+        <Button
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           onClick={() => navigate(`/class-detail/${classId}`)}
         >
           {buttonLabel}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -166,16 +168,14 @@ function ClassManagement() {
           margin: 10,
         }}
       >
-        <input
+        <Input
           type="text"
           placeholder="Tìm khóa học"
-          className="px-4 py-2 border border-gray-300 rounded mt-2 lg:mt-2 lg:ml-2 w-full sm:w-auto"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
         />
-        <button
+        <Button
           onClick={handleSearch}
-          className="px-4 py-2 bg-blue-500 text-white rounded mt-2 lg:mt-2 lg:ml-2 flex items-center w-full sm:w-auto"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +192,7 @@ function ClassManagement() {
             />
           </svg>
           Tìm
-        </button>
+        </Button>
       </div>
       <div>
         {classes.map((cls, index) => (
