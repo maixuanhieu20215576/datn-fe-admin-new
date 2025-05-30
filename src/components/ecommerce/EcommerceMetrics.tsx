@@ -7,8 +7,10 @@ import {
 } from "../../icons";
 import Badge from "../ui/badge/Badge";
 import axios from "axios";
-import { formatNumber } from "../common/utils";
+import { formatNumber, useAccessToken } from "../common/utils";
 export default function EcommerceMetrics() {
+  const token = useAccessToken();
+
   const [orderStatistics, setOrderStatistics] = useState({
     totalStudents: 0,
     comparedTotalStudents: 0,
@@ -18,7 +20,14 @@ export default function EcommerceMetrics() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/get-order-statistics`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/get-order-statistics`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setOrderStatistics(response.data);
     };
     fetchData();
@@ -41,9 +50,18 @@ export default function EcommerceMetrics() {
               {formatNumber(orderStatistics.totalStudents)}
             </h4>
           </div>
-          <Badge color={orderStatistics.comparedTotalStudents > 0 ? "success" : "error"}>
-            {orderStatistics.comparedTotalStudents > 0 ? <ArrowUpIcon /> : <ArrowDownIcon />}
-            {formatNumber((orderStatistics.comparedTotalStudents))}%          </Badge>
+          <Badge
+            color={
+              orderStatistics.comparedTotalStudents > 0 ? "success" : "error"
+            }
+          >
+            {orderStatistics.comparedTotalStudents > 0 ? (
+              <ArrowUpIcon />
+            ) : (
+              <ArrowDownIcon />
+            )}
+            {formatNumber(orderStatistics.comparedTotalStudents)}%{" "}
+          </Badge>
         </div>
       </div>
       {/* <!-- Metric Item End --> */}
@@ -63,8 +81,16 @@ export default function EcommerceMetrics() {
             </h4>
           </div>
 
-          <Badge color={orderStatistics.comparedTotalRevenue > 0 ? "success" : "error"}>
-            {orderStatistics.comparedTotalRevenue > 0 ? <ArrowUpIcon /> : <ArrowDownIcon />}  
+          <Badge
+            color={
+              orderStatistics.comparedTotalRevenue > 0 ? "success" : "error"
+            }
+          >
+            {orderStatistics.comparedTotalRevenue > 0 ? (
+              <ArrowUpIcon />
+            ) : (
+              <ArrowDownIcon />
+            )}
             {formatNumber(orderStatistics.comparedTotalRevenue)}%
           </Badge>
         </div>

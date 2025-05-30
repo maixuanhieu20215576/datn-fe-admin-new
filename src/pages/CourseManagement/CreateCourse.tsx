@@ -7,6 +7,7 @@ import FileInput from "../../components/form/input/FileInput";
 import { PlusIcon, TrashBinIcon } from "../../icons";
 import SelectUsingReactSelect from "../../components/form/form-elements/ReactSelect";
 import axios from "axios";
+import { useAccessToken } from "../../components/common/utils";
 type Unit = {
   title: string;
   overview: string;
@@ -42,6 +43,7 @@ export default function CreateCourse() {
     { value: "Polish", label: "Tiếng Ba Lan" },
     { value: "French", label: "Tiếng Pháp" },
   ];
+  const token = useAccessToken();
 
   const addLecture = () => {
     setLectures([...lectures, { name: "", units: [] }]);
@@ -151,6 +153,7 @@ export default function CreateCourse() {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
         }
       );

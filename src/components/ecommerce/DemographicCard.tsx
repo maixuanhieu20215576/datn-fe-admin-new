@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CountryMap from "./CountryMap";
 import axios from "axios";
+import { useAccessToken } from "../common/utils";
 
 interface LanguageFrequent {
   language: string;
@@ -10,17 +11,22 @@ interface LanguageFrequent {
 
 export default function DemographicCard() {
   const [languageFrequent, setLanguageFrequent] = useState<LanguageFrequent[]>([]);
+  const token = useAccessToken();
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/get-language-frequent`
+        `${import.meta.env.VITE_API_URL}/admin/get-language-frequent`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setLanguageFrequent(response.data);
     };
     fetchData();
   }, []);
-  console.log(languageFrequent);
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] sm:p-6">
       <div className="flex justify-between">

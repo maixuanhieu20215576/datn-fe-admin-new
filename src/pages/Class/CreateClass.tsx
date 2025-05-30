@@ -11,6 +11,7 @@ import Radio from "../../components/form/input/Radio";
 import Alert from "../../components/ui/alert/Alert";
 import FileInput from "../../components/form/input/FileInput";
 import imageCompression from "browser-image-compression";
+import { useAccessToken } from "../../components/common/utils";
 
 type Teacher = {
   _id: string;
@@ -62,6 +63,7 @@ export default function CreateClass() {
 
   const [classType, setClassType] = useState<string>("singleClass");
   const [priceType, setPriceType] = useState<string>("byDay");
+  const token = useAccessToken();
 
   const handleClassTypeRadioChange = (value: string) => {
     setClassType(value);
@@ -80,6 +82,7 @@ export default function CreateClass() {
           {
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -124,7 +127,7 @@ export default function CreateClass() {
 
   const createClass = async () => {
     let response;
-  
+
     const formData = new FormData();
     formData.append("className", className);
     formData.append("teachingLanguage", teachingLanguage);
@@ -137,13 +140,13 @@ export default function CreateClass() {
     if (thumbnail) {
       formData.append("thumbnail", thumbnail);
     }
-  
+
     if (classType === "singleClass") {
       formData.append("classType", "singleClass");
       formData.append("timeFrom", timeFrom || "");
       formData.append("timeTo", timeTo || "");
       formData.append("schedule", JSON.stringify(dayForSingleClass));
-  
+
       try {
         response = await axios.post(
           `${import.meta.env.VITE_API_URL}/admin/create-class`,
@@ -151,6 +154,7 @@ export default function CreateClass() {
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -160,13 +164,13 @@ export default function CreateClass() {
         setIsError(true);
       }
     }
-  
+
     if (classType === "classByWeeks") {
       formData.append("classType", "classByWeeks");
       formData.append("schedule", JSON.stringify(rows));
       formData.append("startDayForClassByWeeks", startDayForClassByWeeks);
       formData.append("endDayForClassByWeeks", endDayForClassByWeeks);
-  
+
       try {
         response = await axios.post(
           `${import.meta.env.VITE_API_URL}/admin/create-class`,
@@ -174,6 +178,7 @@ export default function CreateClass() {
           {
             headers: {
               "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -183,13 +188,13 @@ export default function CreateClass() {
         setIsError(true);
       }
     }
-  
+
     // Reset alert after 3 seconds
     setTimeout(() => {
       setIsError(null);
     }, 3000);
   };
-  
+
   useEffect(() => {
     if (isError !== null) {
       setShowAlert(true);

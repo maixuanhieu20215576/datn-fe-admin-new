@@ -8,9 +8,11 @@ import moment from "moment";
 import { FC } from "react";
 import imageCompression from "browser-image-compression";
 import axios from "axios";
+import { useAccessToken } from "../common/utils";
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
+  const token = useAccessToken();
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const [fullName, setFullName] = useState<string>(user?.fullName);
@@ -21,7 +23,10 @@ export default function UserMetaCard() {
   const [facebook, setFacebook] = useState<string>(user?.facebook || "*");
   const [linkedin, setLinkedin] = useState<string>(user?.linkedin || "*");
   const [avatar, setAvatar] = useState<File>();
-  const [previewAvatar, setPreviewAvatar] = useState<string>(user?.avatar || "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg");
+  const [previewAvatar, setPreviewAvatar] = useState<string>(
+    user?.avatar ||
+      "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
+  );
 
   interface FileInputProps {
     className?: string;
@@ -78,6 +83,7 @@ export default function UserMetaCard() {
           headers: {
             "Content-Type": "multipart/form-data",
             userId: user._id,
+            Authorization: `Bearer ${token}`,
           },
           timeout: 5000,
         }

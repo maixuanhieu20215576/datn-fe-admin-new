@@ -17,6 +17,7 @@ import Label from "../../form/Label";
 import Input from "../../form/input/InputField";
 import Button from "../../ui/button/Button";
 import Select from "../../form/Select";
+import { useAccessToken } from "../../common/utils";
 
 interface ApplicationForm {
   _id: string;
@@ -40,6 +41,12 @@ const fetchApllicationForm = async ({
   filterStatus = constants.applicationStatus.all,
   page = 1,
   itemPerPage = 10,
+  token,
+}: {
+  filterStatus?: string;
+  page?: number;
+  itemPerPage?: number;
+  token: string;
 }) => {
   const response = await axios.post(
     `${import.meta.env.VITE_API_URL}/admin/fetch-application-forms`,
@@ -51,6 +58,7 @@ const fetchApllicationForm = async ({
     {
       headers: {
         "Content-Type": "application/json", // Set the correct content type
+        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -62,9 +70,11 @@ const fetchApllicationForm = async ({
 const updateApplicationFormStatus = async ({
   updateStatus,
   applicationFormId,
+  token,
 }: {
   updateStatus: ApplicationForm["status"];
   applicationFormId: string;
+  token?: string;
 }) => {
   await axios.post(
     `${import.meta.env.VITE_API_URL}/admin//update-application-form-status`,
@@ -75,6 +85,7 @@ const updateApplicationFormStatus = async ({
     {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -106,10 +117,13 @@ export default function ApplicationFormTable() {
     ApplicationForm[]
   >([]);
 
+  const token = useAccessToken();
+
   const handleSave = async () => {
     await updateApplicationFormStatus({
       updateStatus: selectedApplicationForm?.status || "Pending",
       applicationFormId: selectedApplicationForm?._id || "",
+      token: token
     });
     closeModal();
   };
@@ -141,6 +155,7 @@ export default function ApplicationFormTable() {
       const data = await fetchApllicationForm({
         itemPerPage: rowsPerPage,
         page,
+        token,
       }); // Await API call
       setApplicationForms(data);
       setFilteredApplicationForm(data);

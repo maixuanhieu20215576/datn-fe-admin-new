@@ -1,4 +1,6 @@
 import { useMediaQuery } from "react-responsive";
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
 
 const useDeviceQueries = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 767px)" });
@@ -25,7 +27,36 @@ const getUserNameFromLocalStorage = () => {
   return user.fullName;
 };
 
+const useAccessToken = () => {
+  const navigate = useNavigate();
+
+  const getAccessToken = () => {
+    const accessToken = localStorage.getItem("accessToken");
+    const token = accessToken ? JSON.parse(accessToken) : null;
+    if (!token || !token.expires || new Date(token.expires) < new Date()) {
+      return null;
+    }
+    return token.token;
+  };
+
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) {
+      navigate("/signin");
+    }
+  }, [navigate]);
+
+  return getAccessToken();
+};
+
 const formatNumber = (number: number) => {
   return number.toLocaleString("vi-VN");
 };
-export { useDeviceQueries, getUserIdFromLocalStorage, getUserRoleFromLocalStorage, formatNumber, getUserNameFromLocalStorage };
+export {
+  useDeviceQueries,
+  getUserIdFromLocalStorage,
+  getUserRoleFromLocalStorage,
+  formatNumber,
+  getUserNameFromLocalStorage,
+  useAccessToken,
+};

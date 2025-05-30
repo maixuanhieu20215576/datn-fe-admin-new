@@ -1,6 +1,9 @@
 import { SetStateAction, useEffect, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
-import { useDeviceQueries } from "../../components/common/utils";
+import {
+  useAccessToken,
+  useDeviceQueries,
+} from "../../components/common/utils";
 import axios from "axios";
 import { constants } from "../../components/common/constant";
 import Pagination from "../../components/ui/pagination/Pagination";
@@ -122,6 +125,8 @@ interface Class {
 
 export default ClassManagement;
 function ClassManagement() {
+  const token = useAccessToken();
+
   const { isDesktop } = useDeviceQueries();
   const [classes, setClasses] = useState<Class[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
@@ -131,7 +136,12 @@ function ClassManagement() {
   const fetchClass = async (searchValue: string) => {
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/admin/fetch-class`,
-      { searchValue: searchValue, page }
+      { searchValue: searchValue, page },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     setClasses(response.data.classes);
     setTotalPages(Math.ceil(response.data.totalClasses / 18));
@@ -174,9 +184,7 @@ function ClassManagement() {
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
         />
-        <Button
-          onClick={handleSearch}
-        >
+        <Button onClick={handleSearch}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

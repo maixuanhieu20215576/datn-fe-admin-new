@@ -2,13 +2,24 @@ import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { formatNumber } from "../common/utils";
+import { formatNumber, useAccessToken } from "../common/utils";
 
 export default function MonthlySalesChart() {
-  const [monthlySales, setMonthlySales] = useState([168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112]);
+  const token = useAccessToken();
+
+  const [monthlySales, setMonthlySales] = useState([
+    168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112,
+  ]);
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/get-monthly-sales`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/get-monthly-sales`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setMonthlySales(response.data);
     };
     fetchData();

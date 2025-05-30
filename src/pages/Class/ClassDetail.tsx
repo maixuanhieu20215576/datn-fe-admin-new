@@ -13,6 +13,7 @@ import axios from "axios";
 import SelectUsingReactSelect from "../../components/form/form-elements/ReactSelect";
 import Alert from "../../components/ui/alert/Alert";
 import Badge from "../../components/ui/badge/Badge";
+import { useAccessToken } from "../../components/common/utils";
 
 // Interfaces remain unchanged
 export interface ISchedule {
@@ -71,9 +72,11 @@ export default function ClassDetail() {
   const [scheduleToDelete, setScheduleToDelete] = useState<number | null>(null);
   const [teacherList, setTeacherList] = useState<ITeacher[]>([]);
 
+  const token = useAccessToken();
+
   const isDateInPast = (dateString: string | undefined) => {
     if (!dateString) return false;
-    const [day, month, year] = dateString.split('/');
+    const [day, month, year] = dateString.split("/");
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -84,9 +87,16 @@ export default function ClassDetail() {
     const fetchClassData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/fetch-class/${classId}`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/admin/fetch-class/${classId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch class data');
+          throw new Error("Failed to fetch class data");
         }
         const data = await response.json();
         setClassData(data.classInfo);
@@ -94,7 +104,7 @@ export default function ClassDetail() {
         setStudents(data.studentInfo);
         setThumbnailPreview(data.classInfo.thumbnail || "");
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
@@ -120,7 +130,7 @@ export default function ClassDetail() {
   // Animation variants
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   useEffect(() => {
@@ -132,6 +142,7 @@ export default function ClassDetail() {
           {
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -162,11 +173,16 @@ export default function ClassDetail() {
     formData.append("classUrl", draftClassData?.classUrl || "");
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/admin/update-class/${classId}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/update-class/${classId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         setClassData(response.data);
@@ -183,7 +199,9 @@ export default function ClassDetail() {
         }, 3000);
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Cập nhật lớp học thất bại");
+      setError(
+        error instanceof Error ? error.message : "Cập nhật lớp học thất bại"
+      );
       setTimeout(() => {
         setError(null);
       }, 3000);
@@ -192,21 +210,24 @@ export default function ClassDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-base-200 to-base-300 p-6">
-      {success && <div className="fixed top-5 left-0 right-0 z-1000 mt-12">
-        <Alert
-          variant="success"
-          title="Thành công"
-          message="Lớp học đã được cập nhật thành công"
-        />
-      </div>
-      }
-      {error && <div className="fixed top-5 left-0 right-0 z-1000 mt-12">
-        <Alert
-          variant="error"
-          title="Lỗi"
-          message="Cập nhật lớp học thất bại"
-        />
-      </div>}
+      {success && (
+        <div className="fixed top-5 left-0 right-0 z-1000 mt-12">
+          <Alert
+            variant="success"
+            title="Thành công"
+            message="Lớp học đã được cập nhật thành công"
+          />
+        </div>
+      )}
+      {error && (
+        <div className="fixed top-5 left-0 right-0 z-1000 mt-12">
+          <Alert
+            variant="error"
+            title="Lỗi"
+            message="Cập nhật lớp học thất bại"
+          />
+        </div>
+      )}
       <PageMeta
         title="EzLearn Admin- Quản lý lớp học"
         description="EzLearn Admin- Quản lý lớp học"
@@ -218,13 +239,18 @@ export default function ClassDetail() {
         className="flex justify-between items-center mb-8"
       >
         <div>
-          <h1 className="text-4xl font-bold text-blue-600">
-            Chi tiết lớp học
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Quản lý thông tin chi tiết về lớp học</p>
+          <h1 className="text-4xl font-bold text-blue-600">Chi tiết lớp học</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Quản lý thông tin chi tiết về lớp học
+          </p>
         </div>
         <Button onClick={openModal}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
           </svg>
           Chỉnh sửa lớp học
@@ -242,25 +268,53 @@ export default function ClassDetail() {
                 {[
                   { label: "Tên lớp", value: classData?.className },
                   { label: "Giảng viên", value: classData?.teacherName },
-                  { label: "Ngôn ngữ", value: classData?.language ? constants.languages[classData.language as keyof typeof constants.languages] : "" },
                   {
-                    label: "Thời gian", value: classData?.schedule?.length === 1
-                      ? classData?.schedule[0]?.date
-                      : `${classData?.schedule?.[0]?.date} - ${classData?.schedule?.[classData.schedule.length - 1]?.date}`
+                    label: "Ngôn ngữ",
+                    value: classData?.language
+                      ? constants.languages[
+                          classData.language as keyof typeof constants.languages
+                        ]
+                      : "",
+                  },
+                  {
+                    label: "Thời gian",
+                    value:
+                      classData?.schedule?.length === 1
+                        ? classData?.schedule[0]?.date
+                        : `${classData?.schedule?.[0]?.date} - ${
+                            classData?.schedule?.[classData.schedule.length - 1]
+                              ?.date
+                          }`,
                   },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 hover:bg-base-200 p-2 rounded-lg transition-colors">
-                    <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">{item.label}:</span>
-                    <span className="text-gray-600 dark:text-gray-400">{item.value}</span>
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 hover:bg-base-200 p-2 rounded-lg transition-colors"
+                  >
+                    <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">
+                      {item.label}:
+                    </span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {item.value}
+                    </span>
                   </div>
                 ))}
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">Trạng thái:</span>
-                  <span className={`badge ${classData?.status === "closed" ? "badge-error" : "badge-success"} animate-bounce dark:text-gray-300`}>
-                    {classData?.status === "closed" ? "Đã kết thúc" : "Đang diễn ra"}
+                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">
+                    Trạng thái:
+                  </span>
+                  <span
+                    className={`badge ${
+                      classData?.status === "closed"
+                        ? "badge-error"
+                        : "badge-success"
+                    } animate-bounce dark:text-gray-300`}
+                  >
+                    {classData?.status === "closed"
+                      ? "Đã kết thúc"
+                      : "Đang diễn ra"}
                   </span>
                 </div>
-
               </div>
             </div>
           </div>
@@ -274,12 +328,20 @@ export default function ClassDetail() {
               </h2>
               <div className="space-y-4 mt-4">
                 <div className="flex items-center gap-3 hover:bg-base-200 p-2 rounded-lg transition-colors">
-                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">Tổng doanh thu:</span>
-                  <span className="text-success font-bold dark:text-gray-300">{classData?.totalRevenue?.toLocaleString()} đ</span>
+                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">
+                    Tổng doanh thu:
+                  </span>
+                  <span className="text-success font-bold dark:text-gray-300">
+                    {classData?.totalRevenue?.toLocaleString()} đ
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 hover:bg-base-200 p-2 rounded-lg transition-colors">
-                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">Học phí/học viên:</span>
-                  <span className="text-success font-bold dark:text-gray-300">{classData?.revenuePerStudent?.toLocaleString()} đ</span>
+                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">
+                    Học phí/học viên:
+                  </span>
+                  <span className="text-success font-bold dark:text-gray-300">
+                    {classData?.revenuePerStudent?.toLocaleString()} đ
+                  </span>
                 </div>
               </div>
             </div>
@@ -294,8 +356,12 @@ export default function ClassDetail() {
               </h2>
               <div className="mt-4">
                 <div className="flex items-center gap-3 hover:bg-base-200 p-2 rounded-lg transition-colors">
-                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">Tổng số học viên:</span>
-                  <span className="text-primary font-bold text-xl dark:text-gray-300">{classData?.totalStudent}</span>
+                  <span className="font-semibold min-w-[120px] text-gray-700 dark:text-gray-300">
+                    Tổng số học viên:
+                  </span>
+                  <span className="text-primary font-bold text-xl dark:text-gray-300">
+                    {classData?.totalStudent}
+                  </span>
                 </div>
               </div>
             </div>
@@ -317,8 +383,18 @@ export default function ClassDetail() {
             <table className="table w-full">
               <thead>
                 <tr className="bg-base-200 text-gray-700 dark:text-gray-300">
-                  {["Họ tên", "Email", "Số điện thoại", "Trạng thái thanh toán"].map((header, index) => (
-                    <th key={index} className="px-4 py-3 text-sm font-semibold text-left">{header}</th>
+                  {[
+                    "Họ tên",
+                    "Email",
+                    "Số điện thoại",
+                    "Trạng thái thanh toán",
+                  ].map((header, index) => (
+                    <th
+                      key={index}
+                      className="px-4 py-3 text-sm font-semibold text-left"
+                    >
+                      {header}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -331,15 +407,28 @@ export default function ClassDetail() {
                     transition={{ delay: index * 0.1 }}
                     className="hover:bg-base-200 dark:hover:bg-base-300 transition-colors"
                   >
-                    <td className="px-4 py-3 font-medium dark:text-gray-300">{student.studentName}</td>
-                    <td className="px-4 py-3 dark:text-gray-300">{student.email}</td>
-                    <td className="px-4 py-3 dark:text-gray-300">{student.phoneNumber}</td>
+                    <td className="px-4 py-3 font-medium dark:text-gray-300">
+                      {student.studentName}
+                    </td>
+                    <td className="px-4 py-3 dark:text-gray-300">
+                      {student.email}
+                    </td>
+                    <td className="px-4 py-3 dark:text-gray-300">
+                      {student.phoneNumber}
+                    </td>
                     <td className="px-4 py-3">
-                      <Badge color={student.paymentStatus === "Success" ? "success" : "error"} >
-                        {student.paymentStatus === "Success" ? "Đã thanh toán" : "Chưa thanh toán"}
+                      <Badge
+                        color={
+                          student.paymentStatus === "Success"
+                            ? "success"
+                            : "error"
+                        }
+                      >
+                        {student.paymentStatus === "Success"
+                          ? "Đã thanh toán"
+                          : "Chưa thanh toán"}
                       </Badge>
                     </td>
-
                   </motion.tr>
                 ))}
               </tbody>
@@ -357,7 +446,10 @@ export default function ClassDetail() {
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Chỉnh sửa lớp học
             </h4>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">Note: Không thể chỉnh sửa một số thông tin khi đã có học viên đăng ký lớp</p>
+            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+              Note: Không thể chỉnh sửa một số thông tin khi đã có học viên đăng
+              ký lớp
+            </p>
           </div>
           <form className="flex flex-col h-full">
             <div className="custom-scrollbar flex-1 overflow-y-auto px-2 pb-3">
@@ -369,7 +461,10 @@ export default function ClassDetail() {
                       value={draftClassData?.className || ""}
                       onChange={(e) => {
                         if (draftClassData) {
-                          setDraftClassData({ ...draftClassData, className: e.target.value });
+                          setDraftClassData({
+                            ...draftClassData,
+                            className: e.target.value,
+                          });
                         }
                       }}
                       type="text"
@@ -387,14 +482,20 @@ export default function ClassDetail() {
                           label: `${teacher.fullName} - ID: ${teacher._id}`,
                         })) || []
                       }
-                      placeholder={draftClassData?.teacherName || "Tìm kiếm giảng viên"}
+                      placeholder={
+                        draftClassData?.teacherName || "Tìm kiếm giảng viên"
+                      }
                       onChange={(option) => {
-                        const selectedTeacher = teacherList?.find((teacher) => teacher._id === option || teacher.fullName === option);
+                        const selectedTeacher = teacherList?.find(
+                          (teacher) =>
+                            teacher._id === option ||
+                            teacher.fullName === option
+                        );
                         if (selectedTeacher && draftClassData) {
                           setDraftClassData({
                             ...draftClassData,
                             teacherId: selectedTeacher._id,
-                            teacherName: selectedTeacher.fullName
+                            teacherName: selectedTeacher.fullName,
                           });
                         }
                       }}
@@ -404,7 +505,10 @@ export default function ClassDetail() {
                   </div>
 
                   <div>
-                    <Label>Học phí theo {classData?.priceType === "byDay" ? "buổi" : "khóa"}</Label>
+                    <Label>
+                      Học phí theo{" "}
+                      {classData?.priceType === "byDay" ? "buổi" : "khóa"}
+                    </Label>
                     <Input
                       value={draftClassData?.price || ""}
                       type="number"
@@ -413,7 +517,7 @@ export default function ClassDetail() {
                         if (draftClassData) {
                           setDraftClassData({
                             ...draftClassData,
-                            price: parseFloat(e.target.value)
+                            price: parseFloat(e.target.value),
                           });
                         }
                       }}
@@ -430,7 +534,7 @@ export default function ClassDetail() {
                         if (draftClassData) {
                           setDraftClassData({
                             ...draftClassData,
-                            classUrl: e.target.value
+                            classUrl: e.target.value,
                           });
                         }
                       }}
@@ -471,9 +575,17 @@ export default function ClassDetail() {
                               className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
                               onChange={(e) => {
                                 if (draftClassData) {
-                                  const newSchedule = [...draftClassData.schedule];
-                                  newSchedule[0] = { ...newSchedule[0], date: e.target.value };
-                                  setDraftClassData({ ...draftClassData, schedule: newSchedule });
+                                  const newSchedule = [
+                                    ...draftClassData.schedule,
+                                  ];
+                                  newSchedule[0] = {
+                                    ...newSchedule[0],
+                                    date: e.target.value,
+                                  };
+                                  setDraftClassData({
+                                    ...draftClassData,
+                                    schedule: newSchedule,
+                                  });
                                 }
                               }}
                             />
@@ -481,29 +593,49 @@ export default function ClassDetail() {
                           <div className="flex-1">
                             <Label className="text-sm">Thời gian bắt đầu</Label>
                             <Input
-                              value={draftClassData?.schedule[0]?.timeFrom || ""}
+                              value={
+                                draftClassData?.schedule[0]?.timeFrom || ""
+                              }
                               type="time"
                               className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
                               onChange={(e) => {
                                 if (draftClassData) {
-                                  const newSchedule = [...draftClassData.schedule];
-                                  newSchedule[0] = { ...newSchedule[0], timeFrom: e.target.value };
-                                  setDraftClassData({ ...draftClassData, schedule: newSchedule });
+                                  const newSchedule = [
+                                    ...draftClassData.schedule,
+                                  ];
+                                  newSchedule[0] = {
+                                    ...newSchedule[0],
+                                    timeFrom: e.target.value,
+                                  };
+                                  setDraftClassData({
+                                    ...draftClassData,
+                                    schedule: newSchedule,
+                                  });
                                 }
                               }}
                             />
                           </div>
                           <div className="flex-1">
-                            <Label className="text-sm">Thời gian kết thúc</Label>
+                            <Label className="text-sm">
+                              Thời gian kết thúc
+                            </Label>
                             <Input
                               value={draftClassData?.schedule[0]?.timeTo || ""}
                               type="time"
                               className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
                               onChange={(e) => {
                                 if (draftClassData) {
-                                  const newSchedule = [...draftClassData.schedule];
-                                  newSchedule[0] = { ...newSchedule[0], timeTo: e.target.value };
-                                  setDraftClassData({ ...draftClassData, schedule: newSchedule });
+                                  const newSchedule = [
+                                    ...draftClassData.schedule,
+                                  ];
+                                  newSchedule[0] = {
+                                    ...newSchedule[0],
+                                    timeTo: e.target.value,
+                                  };
+                                  setDraftClassData({
+                                    ...draftClassData,
+                                    schedule: newSchedule,
+                                  });
                                 }
                               }}
                             />
@@ -511,67 +643,100 @@ export default function ClassDetail() {
                         </div>
                       ) : (
                         <>
-                          {draftClassData?.schedule.map((schedule: ISchedule, index: number) => (
-                            <div key={index} className="flex gap-4 items-end">
-                              <div className="flex-1">
-                                <Label className="text-sm">Ngày học</Label>
-                                <Input
-                                  value={schedule.date || ""}
-                                  type="text"
-                                  className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
-                                  onChange={(e) => {
-                                    if (draftClassData) {
-                                      const newSchedule = [...draftClassData.schedule];
-                                      newSchedule[index] = { ...newSchedule[index], date: e.target.value };
-                                      setDraftClassData({ ...draftClassData, schedule: newSchedule });
-                                    }
+                          {draftClassData?.schedule.map(
+                            (schedule: ISchedule, index: number) => (
+                              <div key={index} className="flex gap-4 items-end">
+                                <div className="flex-1">
+                                  <Label className="text-sm">Ngày học</Label>
+                                  <Input
+                                    value={schedule.date || ""}
+                                    type="text"
+                                    className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                                    onChange={(e) => {
+                                      if (draftClassData) {
+                                        const newSchedule = [
+                                          ...draftClassData.schedule,
+                                        ];
+                                        newSchedule[index] = {
+                                          ...newSchedule[index],
+                                          date: e.target.value,
+                                        };
+                                        setDraftClassData({
+                                          ...draftClassData,
+                                          schedule: newSchedule,
+                                        });
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <Label className="text-sm">
+                                    Thời gian bắt đầu
+                                  </Label>
+                                  <Input
+                                    value={schedule.timeFrom}
+                                    type="time"
+                                    className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                                    onChange={(e) => {
+                                      if (draftClassData) {
+                                        const newSchedule = [
+                                          ...draftClassData.schedule,
+                                        ];
+                                        newSchedule[index] = {
+                                          ...newSchedule[index],
+                                          timeFrom: e.target.value,
+                                        };
+                                        setDraftClassData({
+                                          ...draftClassData,
+                                          schedule: newSchedule,
+                                        });
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <Label className="text-sm">
+                                    Thời gian kết thúc
+                                  </Label>
+                                  <Input
+                                    value={schedule.timeTo}
+                                    type="time"
+                                    className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
+                                    onChange={(e) => {
+                                      if (draftClassData) {
+                                        const newSchedule = [
+                                          ...draftClassData.schedule,
+                                        ];
+                                        newSchedule[index] = {
+                                          ...newSchedule[index],
+                                          timeTo: e.target.value,
+                                        };
+                                        setDraftClassData({
+                                          ...draftClassData,
+                                          schedule: newSchedule,
+                                        });
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="btn-error"
+                                  onClick={() => {
+                                    setScheduleToDelete(index);
+                                    setShowConfirmModal(true);
                                   }}
-                                />
+                                  disabled={
+                                    (classData?.currentStudent ?? 0) > 0 ||
+                                    isDateInPast(schedule.date)
+                                  }
+                                >
+                                  Hoãn
+                                </Button>
                               </div>
-                              <div className="flex-1">
-                                <Label className="text-sm">Thời gian bắt đầu</Label>
-                                <Input
-                                  value={schedule.timeFrom}
-                                  type="time"
-                                  className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
-                                  onChange={(e) => {
-                                    if (draftClassData) {
-                                      const newSchedule = [...draftClassData.schedule];
-                                      newSchedule[index] = { ...newSchedule[index], timeFrom: e.target.value };
-                                      setDraftClassData({ ...draftClassData, schedule: newSchedule });
-                                    }
-                                  }}
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <Label className="text-sm">Thời gian kết thúc</Label>
-                                <Input
-                                  value={schedule.timeTo}
-                                  type="time"
-                                  className="bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-400"
-                                  onChange={(e) => {
-                                    if (draftClassData) {
-                                      const newSchedule = [...draftClassData.schedule];
-                                      newSchedule[index] = { ...newSchedule[index], timeTo: e.target.value };
-                                      setDraftClassData({ ...draftClassData, schedule: newSchedule });
-                                    }
-                                  }}
-                                />
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="btn-error"
-                                onClick={() => {
-                                  setScheduleToDelete(index);
-                                  setShowConfirmModal(true);
-                                }}
-                                disabled={(classData?.currentStudent ?? 0) > 0 || isDateInPast(schedule.date)}
-                              >
-                                Hoãn
-                              </Button>
-                            </div>
-                          ))}
+                            )
+                          )}
                           <Button
                             size="sm"
                             variant="outline"
@@ -580,11 +745,14 @@ export default function ClassDetail() {
                                 const newSchedule = {
                                   date: "",
                                   timeFrom: "",
-                                  timeTo: ""
+                                  timeTo: "",
                                 };
                                 setDraftClassData({
                                   ...draftClassData,
-                                  schedule: [...draftClassData.schedule, newSchedule]
+                                  schedule: [
+                                    ...draftClassData.schedule,
+                                    newSchedule,
+                                  ],
                                 });
                               }
                             }}
@@ -600,9 +768,11 @@ export default function ClassDetail() {
             </div>
             <div className="flex items-center gap-3 px-2 mt-4 lg:justify-end border-t pt-4">
               <Button size="sm" variant="outline" onClick={closeModal}>
-                Đóng              </Button>
+                Đóng{" "}
+              </Button>
               <Button size="sm" onClick={handleSaveChanges}>
-                Lưu thay đổi              </Button>
+                Lưu thay đổi{" "}
+              </Button>
             </div>
           </form>
         </div>
@@ -616,7 +786,11 @@ export default function ClassDetail() {
           <h3 className="text-lg font-semibold mb-4">Xác nhận hoãn lớp học</h3>
           <p className="mb-6">Bạn có chắc chắn muốn hoãn lớp học này?</p>
           <div className="flex justify-end gap-3">
-            <Button size="sm" variant="outline" onClick={() => setShowConfirmModal(false)}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowConfirmModal(false)}
+            >
               Hủy
             </Button>
             <Button
@@ -625,7 +799,10 @@ export default function ClassDetail() {
                 if (scheduleToDelete !== null && draftClassData) {
                   const newSchedule = [...draftClassData.schedule];
                   newSchedule.splice(scheduleToDelete, 1);
-                  setDraftClassData({ ...draftClassData, schedule: newSchedule });
+                  setDraftClassData({
+                    ...draftClassData,
+                    schedule: newSchedule,
+                  });
                 }
                 setShowConfirmModal(false);
                 setScheduleToDelete(null);

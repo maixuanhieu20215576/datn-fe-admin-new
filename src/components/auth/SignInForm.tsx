@@ -7,7 +7,11 @@ import Button from "../ui/button/Button";
 import axios from "axios";
 import { useNavigate } from "react-router";
 
-export default function SignInForm({ setUserId }: { setUserId: (userId: string) => void }) {
+export default function SignInForm({
+  setUserId,
+}: {
+  setUserId: (userId: string) => void;
+}) {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -28,10 +32,13 @@ export default function SignInForm({ setUserId }: { setUserId: (userId: string) 
         }
       );
 
-      if (loginResponse.status === 200 && loginResponse.data.user.role === "admin") {
+      if (
+        loginResponse.status === 200 &&
+        loginResponse.data.user.role === "admin"
+      ) {
         setTimeout(() => {
           const { accessToken, user } = loginResponse.data;
-          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("accessToken", JSON.stringify(accessToken));
           localStorage.setItem("user", JSON.stringify(user));
           setUserId(user._id);
           navigate("/");

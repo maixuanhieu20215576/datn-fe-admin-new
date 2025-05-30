@@ -5,7 +5,7 @@ import { Link } from "react-router";
 import axios from "axios";
 import Switch from "../form/switch/Switch";
 import moment from "moment";
-import { getUserIdFromLocalStorage } from "../common/utils";
+import { getUserIdFromLocalStorage, useAccessToken } from "../common/utils";
 interface Notification {
   _id: string;
   sourceUserId: {
@@ -16,18 +16,23 @@ interface Notification {
   content: string;
   title: string;
   createdAt: string;
-  status: string,
+  status: string;
 }
 
-
-
 export default function NotificationDropdown() {
+  const token = useAccessToken();
+
   const [isOpen, setIsOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadNotifications, setUnreadNotifications] = useState<Notification[]>([]);
-  const [displayNotifications, setDisplayNotifications] = useState<Notification[]>([]);
-  const [isUnreadNotificationOnly, setIsUnreadNotificationOnly] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState<
+    Notification[]
+  >([]);
+  const [displayNotifications, setDisplayNotifications] = useState<
+    Notification[]
+  >([]);
+  const [isUnreadNotificationOnly, setIsUnreadNotificationOnly] =
+    useState(false);
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -42,22 +47,50 @@ export default function NotificationDropdown() {
     setNotifying(false);
   };
   const fetchNotifications = async () => {
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/get-notification`, {
-      userId: getUserIdFromLocalStorage(),
-      page: 1,
-      status: isUnreadNotificationOnly ? 'new' : null
-    });
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/user/get-notification`,
+      {
+        userId: getUserIdFromLocalStorage(),
+        page: 1,
+        status: isUnreadNotificationOnly ? "new" : null,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     setNotifications(response.data);
-    setUnreadNotifications(response.data.filter((notification: Notification) => notification.status === 'new'));
-    setDisplayNotifications(isUnreadNotificationOnly ? response.data.filter((notification: Notification) => notification.status === 'new') : response.data);
+    setUnreadNotifications(
+      response.data.filter(
+        (notification: Notification) => notification.status === "new"
+      )
+    );
+    setDisplayNotifications(
+      isUnreadNotificationOnly
+        ? response.data.filter(
+            (notification: Notification) => notification.status === "new"
+          )
+        : response.data
+    );
   };
 
   const handleMarkAllAsRead = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/user/mark-all-notification-as-read`, {
-        userId: getUserIdFromLocalStorage(),
-        notificationIds: notifications.map((notification) => notification._id)
-      });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/user/mark-all-notification-as-read`,
+        {
+          userId: getUserIdFromLocalStorage(),
+          notificationIds: notifications.map(
+            (notification) => notification._id
+          ),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       fetchNotifications();
     } catch (error) {
       console.error("Error marking notifications as read:", error);
@@ -65,14 +98,14 @@ export default function NotificationDropdown() {
   };
 
   useEffect(() => {
-
     fetchNotifications();
   }, []);
 
   const handleSwitchChange = () => {
-    setDisplayNotifications(!isUnreadNotificationOnly ? unreadNotifications : notifications);
+    setDisplayNotifications(
+      !isUnreadNotificationOnly ? unreadNotifications : notifications
+    );
     setIsUnreadNotificationOnly(!isUnreadNotificationOnly);
-
   };
 
   return (
@@ -81,14 +114,15 @@ export default function NotificationDropdown() {
         className="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full dropdown-toggle hover:text-gray-700 h-11 w-11 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
         onClick={handleClick}
       >
-        {notifications.length > 0 &&
+        {notifications.length > 0 && (
           <span
-            className={`absolute right-0 top-0.5 z-10 h-2 w-2 rounded-full bg-orange-400 ${!notifying ? "hidden" : "flex"
-              }`}
+            className={`absolute right-0 top-0.5 z-10 h-2 w-2 rounded-full bg-orange-400 ${
+              !notifying ? "hidden" : "flex"
+            }`}
           >
             <span className="absolute inline-flex w-full h-full bg-orange-400 rounded-full opacity-75 animate-ping"></span>
           </span>
-        }
+        )}
         <svg
           className="fill-current"
           width="20"
@@ -110,7 +144,6 @@ export default function NotificationDropdown() {
         className="absolute -right-[240px] mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:w-[361px] lg:right-0"
       >
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-700">
-
           <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             Thông báo
           </h5>
@@ -147,8 +180,11 @@ export default function NotificationDropdown() {
             <li key={notification._id}>
               <DropdownItem
                 onItemClick={closeDropdown}
-                className={`flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5 ${notification.status === 'new' ? 'bg-gray-50 dark:bg-gray-800/50' : ''
-                  }`}
+                className={`flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5 ${
+                  notification.status === "new"
+                    ? "bg-gray-50 dark:bg-gray-800/50"
+                    : ""
+                }`}
               >
                 <span className="relative block w-full h-10 rounded-full z-1 max-w-10">
                   <img
@@ -164,22 +200,26 @@ export default function NotificationDropdown() {
                 <span className="block">
                   <span className="mb-1.5 block  text-theme-sm text-gray-500 dark:text-gray-400 space-x-1">
                     <span className="font-medium text-gray-800 dark:text-white/90">
-                      {notification.sourceUserId.role === 'admin' ? 'Quản trị viên' : notification.sourceUserId.fullName}
+                      {notification.sourceUserId.role === "admin"
+                        ? "Quản trị viên"
+                        : notification.sourceUserId.fullName}
                     </span>
                     <span> {notification.content}</span>
-
                   </span>
 
                   <span className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400">
                     <span>{notification.title}</span>
                     <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                    <span>{moment(notification.createdAt).format('DD/MM/YYYY HH:mm')}</span>
+                    <span>
+                      {moment(notification.createdAt).format(
+                        "DD/MM/YYYY HH:mm"
+                      )}
+                    </span>
                   </span>
                 </span>
               </DropdownItem>
             </li>
           ))}
-
 
           {/* Add more items as needed */}
         </ul>
@@ -190,7 +230,6 @@ export default function NotificationDropdown() {
           Xem thêm
         </Link>
         <div className="flex gap-4 py-3">
-
           <Switch
             label="Chỉ hiện thông báo chưa đọc"
             defaultChecked={isUnreadNotificationOnly}
