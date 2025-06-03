@@ -6,8 +6,8 @@ export default function SignIn({ setUserId }: { setUserId: (userId: string) => v
   return (
     <>
       <PageMeta
-        title="React.js SignIn Dashboard | TailAdmin - Next.js Admin Dashboard Template"
-        description="This is React.js SignIn Tables Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
+        title="EzLearn - Đăng nhập"
+        description="EzLearn - Đăng nhập"
       />
       <AuthLayout>
         <SignInForm setUserId={setUserId} />

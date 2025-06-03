@@ -11,6 +11,7 @@ import {
   HorizontaLDots,
   ListIcon,
   PencilIcon,
+  PencilSquareIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -67,6 +68,13 @@ const navItems: NavItem[] = [
     icon: <ChatIcon />,
     name: "Chat",
     path: "/chat",
+  },
+   {
+    icon: <PencilSquareIcon />,
+    name: "Quản lý thi cử",
+    subItems: [
+      { name: "Tạo bài thi", path: "/create-test" },
+    ],
   },
   /*{
     name: "Pages",
@@ -325,16 +333,16 @@ const AppSidebar: React.FC = () => {
             <>
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/new-logo.svg"
                 alt="Logo"
-                width={150}
+                width={50}
                 height={40}
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/new-logo.svg"
                 alt="Logo"
-                width={150}
+                width={50}
                 height={40}
               />
             </>

@@ -26,6 +26,7 @@ import { useState } from "react";
 import PaymentManagement from "./pages/TeacherManagement.tsx/PaymentMangement";
 import Chat from "./pages/Chat";
 import CreateCourse from "./pages/CourseManagement/CreateCourse";
+import CreateTest from "./pages/TestManagement/CreateTest";
 
 export default function App() {
   const [userId, setUserId] = useState(() => {
@@ -70,6 +71,8 @@ export default function App() {
             <Route path="/payment-management" element={<PaymentManagement />} />
             <Route path='/create-course' element={<CreateCourse />} />
             <Route path="/chat" element={<Chat />} />
+
+            <Route path='/create-test' element={<CreateTest />}/>
           </Route>
 
           {/* Auth Layout */}
