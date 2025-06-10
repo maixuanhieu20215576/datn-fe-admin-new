@@ -27,6 +27,9 @@ import PaymentManagement from "./pages/TeacherManagement.tsx/PaymentMangement";
 import Chat from "./pages/Chat";
 import CreateCourse from "./pages/CourseManagement/CreateCourse";
 import CreateTest from "./pages/TestManagement/CreateTest";
+import Course from "./pages/Course";
+import YourCourseDetail from "./pages/YourCourseDetail";
+import UnitPage from "./components/UnitDetail";
 
 export default function App() {
   const [userId, setUserId] = useState(() => {
@@ -39,9 +42,19 @@ export default function App() {
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={userId ? <AppLayout /> : <SignIn setUserId={setUserId} />}>
+          <Route
+            element={userId ? <AppLayout /> : <SignIn setUserId={setUserId} />}
+          >
             <Route index path="/" element={<Home />} />
-
+            <Route path="/course" element={<Course />} />
+            <Route
+              path="/your-course/:courseId"
+              element={<YourCourseDetail />}
+            />
+            <Route
+              path="/your-course/:id/unit/:unitId"
+              element={<UnitPage />}
+            />
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
             <Route path="/calendar" element={<Calendar />} />
@@ -69,10 +82,10 @@ export default function App() {
             <Route path="/class-management" element={<ClassManagement />} />
             <Route path="/class-detail/:classId" element={<ClassDetail />} />
             <Route path="/payment-management" element={<PaymentManagement />} />
-            <Route path='/create-course' element={<CreateCourse />} />
+            <Route path="/create-course" element={<CreateCourse />} />
             <Route path="/chat" element={<Chat />} />
 
-            <Route path='/create-test' element={<CreateTest />}/>
+            <Route path="/create-test" element={<CreateTest />} />
           </Route>
 
           {/* Auth Layout */}

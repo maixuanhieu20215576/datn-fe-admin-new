@@ -8,6 +8,7 @@ import { PlusIcon, TrashBinIcon } from "../../icons";
 import SelectUsingReactSelect from "../../components/form/form-elements/ReactSelect";
 import axios from "axios";
 import { useAccessToken } from "../../components/common/utils";
+import { useNavigate } from "react-router";
 type Unit = {
   title: string;
   overview: string;
@@ -21,6 +22,7 @@ type Lecture = {
 };
 
 export default function CreateCourse() {
+  const navigate = useNavigate();
   const [courseName, setCourseName] = useState("");
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [instructor, setInstructor] = useState("");
@@ -146,8 +148,7 @@ export default function CreateCourse() {
         });
       });
 
-      // Gửi về backend
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_API_URL}/course/create-course`,
         formData,
         {
@@ -158,8 +159,8 @@ export default function CreateCourse() {
         }
       );
 
-      console.log("✅ Khóa học đã được tạo:", response.data);
       alert("Tạo khóa học thành công!");
+      navigate("/course");
     } catch (error) {
       console.error("❌ Lỗi khi tạo khóa học:", error);
       alert("Đã xảy ra lỗi khi tạo khóa học!");

@@ -62,6 +62,7 @@ const navItems: NavItem[] = [
     name: "Quản lý khóa học",
     subItems: [
       { name: "Tạo khóa học", path: "/create-course" },
+      { name: "Chỉnh sửa khóa học", path: "/course" },
     ],
   },
   {
