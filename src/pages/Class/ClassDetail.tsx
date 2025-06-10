@@ -100,6 +100,7 @@ export default function ClassDetail() {
         }
         const data = await response.json();
         setClassData(data.classInfo);
+        console.log(data.classInfo)
         setDraftClassData(data.classInfo);
         setStudents(data.studentInfo);
         setThumbnailPreview(data.classInfo.thumbnail || "");
@@ -728,7 +729,6 @@ export default function ClassDetail() {
                                     setShowConfirmModal(true);
                                   }}
                                   disabled={
-                                    (classData?.currentStudent ?? 0) > 0 ||
                                     isDateInPast(schedule.date)
                                   }
                                 >
