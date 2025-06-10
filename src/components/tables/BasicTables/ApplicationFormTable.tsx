@@ -18,6 +18,7 @@ import Input from "../../form/input/InputField";
 import Button from "../../ui/button/Button";
 import Select from "../../form/Select";
 import { useAccessToken } from "../../common/utils";
+import Pagination from "../../ui/pagination/Pagination";
 
 interface ApplicationForm {
   _id: string;
@@ -42,11 +43,13 @@ const fetchApllicationForm = async ({
   page = 1,
   itemPerPage = 10,
   token,
+  username = "",
 }: {
   filterStatus?: string;
   page?: number;
   itemPerPage?: number;
   token: string;
+  username: string;
 }) => {
   const response = await axios.post(
     `${import.meta.env.VITE_API_URL}/admin/fetch-application-forms`,
@@ -54,6 +57,7 @@ const fetchApllicationForm = async ({
       page,
       itemPerPage,
       filterStatus,
+      username,
     },
     {
       headers: {
@@ -63,8 +67,8 @@ const fetchApllicationForm = async ({
     }
   );
 
-  const applicationForms = response.data;
-  return applicationForms;
+  const { applicationForms, totalDocuments } = response.data;
+  return { applicationForms, totalDocuments };
 };
 
 const updateApplicationFormStatus = async ({
@@ -108,7 +112,6 @@ export default function ApplicationFormTable() {
     ApplicationForm[]
   >([]);
   const [rowsPerPage] = React.useState<number>(10);
-  const [page] = React.useState<number>(1);
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedApplicationForm, setSelectedApplicationForm] =
     React.useState<ApplicationForm>();
@@ -117,13 +120,19 @@ export default function ApplicationFormTable() {
     ApplicationForm[]
   >([]);
 
+  const [username, setUsername] = React.useState<string>("");
+  const [debounceTimeout, setDebounceTimeout] =
+    React.useState<NodeJS.Timeout | null>(null);
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
+  const [totalPage, setTotalPage] = React.useState<number>(1);
+
   const token = useAccessToken();
 
   const handleSave = async () => {
     await updateApplicationFormStatus({
       updateStatus: selectedApplicationForm?.status || "Pending",
       applicationFormId: selectedApplicationForm?._id || "",
-      token: token
+      token: token,
     });
     closeModal();
   };
@@ -144,25 +153,31 @@ export default function ApplicationFormTable() {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const searchValue = event.target.value.toLowerCase();
-    const filteredApplicationForms = applicationForms.filter((form) =>
-      form.fullName.toLowerCase().includes(searchValue)
-    );
-    setFilteredApplicationForm(filteredApplicationForms);
-  };
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
 
+    const timeoutId = setTimeout(() => {
+      setUsername(searchValue);
+    }, 200);
+
+    setDebounceTimeout(timeoutId);
+  };
   React.useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchApllicationForm({
+      const { applicationForms, totalDocuments } = await fetchApllicationForm({
         itemPerPage: rowsPerPage,
-        page,
+        page: currentPage,
         token,
+        username,
       }); // Await API call
-      setApplicationForms(data);
-      setFilteredApplicationForm(data);
+      setApplicationForms(applicationForms);
+      setFilteredApplicationForm(applicationForms);
+      setTotalPage(Math.ceil(totalDocuments / 10));
     };
 
     fetchData();
-  }, [rowsPerPage, page]); // Dependency array inside useEffect
+  }, [rowsPerPage, currentPage, username]); // Dependency array inside useEffect
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -320,6 +335,13 @@ export default function ApplicationFormTable() {
                 )
               )}
             </TableBody>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPage}
+              onPageChange={function (page: number): void {
+                setCurrentPage(page);
+              }}
+            ></Pagination>
           </Table>
           <Modal
             isOpen={isOpen}

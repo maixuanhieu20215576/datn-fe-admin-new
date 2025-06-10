@@ -1,3 +1,5 @@
+import Button from "../button/Button";
+
 interface PaginationProps {
     currentPage: number;
     totalPages: number;
@@ -38,20 +40,19 @@ interface PaginationProps {
   
     return (
       <div className="flex justify-center space-x-4 mt-6">
-      <button
+      <Button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
       >
         Previous
-      </button>
+      </Button>
       {pageNumbers.map((number, index) =>
         number === "..." ? (
           <span key={`ellipsis-${index}`} className="px-4 py-2 text-gray-500">
             ...
           </span>
         ) : (
-          <button
+          <Button
             // Ensuring unique key by prefixing with 'page-'
             key={`page-${number}`}
             onClick={() => onPageChange(number as number)}
@@ -62,16 +63,16 @@ interface PaginationProps {
             }`}
           >
             {number}
-          </button>
+          </Button>
         )
       )}
-      <button
+      <Button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
       >
         Next
-      </button>
+      </Button>
     </div>
     
     );
