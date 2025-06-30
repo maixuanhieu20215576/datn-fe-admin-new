@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ClipLoader } from "react-spinners";
 import Button from "../../components/ui/button/Button";
 import ComponentCard from "../../components/common/ComponentCard";
 import Input from "../../components/form/input/InputField";
@@ -32,6 +33,7 @@ export default function CreateCourse() {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
 
   const [lectures, setLectures] = useState<Lecture[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const teachingLanguageOptions = [
     { value: "English", label: "Tiếng Anh" },
@@ -109,7 +111,9 @@ export default function CreateCourse() {
     setLectures(updatedLectures);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    setIsLoading(true);
     try {
       const formData = new FormData();
       console.log(thumbnail);
@@ -160,6 +164,7 @@ export default function CreateCourse() {
       );
 
       alert("Tạo khóa học thành công!");
+      setIsLoading(false);
       navigate("/course");
     } catch (error) {
       console.error("❌ Lỗi khi tạo khóa học:", error);
@@ -313,8 +318,12 @@ export default function CreateCourse() {
       <Button onClick={addLecture} className="flex items-center gap-2">
         <PlusIcon /> Thêm chương
       </Button>
-      <Button onClick={handleSubmit} className="w-full py-4 text-lg">
-        Tạo Khóa Học
+      <Button
+        onClick={handleSubmit}
+        className="w-full py-4 text-lg"
+        disabled={isLoading}
+      >
+        {isLoading ? <ClipLoader size={24} color="#fff" /> : "Tạo Khóa Học"}
       </Button>
     </div>
   );

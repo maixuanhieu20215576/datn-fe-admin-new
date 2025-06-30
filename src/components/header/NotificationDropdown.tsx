@@ -190,8 +190,10 @@ export default function NotificationDropdown() {
                   <img
                     width={40}
                     height={40}
-                    src={notification.sourceUserId.avatar ||
-                      "https://i.imgur.com/4df6B8R.jpeg"}
+                    src={
+                      notification.sourceUserId.avatar ||
+                      "https://i.imgur.com/4df6B8R.jpeg"
+                    }
                     alt="User"
                     className="w-full overflow-hidden rounded-full"
                   />
