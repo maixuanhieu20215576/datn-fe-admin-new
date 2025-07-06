@@ -14,7 +14,7 @@ interface QuestionInput {
   correctAnswer: number;
   type: string | undefined;
   subQuestions?: SubQuestion[];
-  audio?: File;
+  audio?: string;
 }
 
 type SubQuestion = {
@@ -114,7 +114,7 @@ export default function CreateTest() {
     newQuestions[index].correctAnswer = choiceIndex + 1; // 1-based index
     setQuestions(newQuestions);
   };
-  const updateQuestion = (
+  const updateQuestion = async (
     index: number,
     field: "question" | "choice" | "type" | "audio",
     value: string | File,
@@ -132,7 +132,15 @@ export default function CreateTest() {
     } else if (field === "type" && typeof value === "string") {
       newQuestions[index].type = value;
     } else if (field === "audio") {
-      newQuestions[index].audio = value as unknown as File;
+      let formData = new FormData();
+      formData.append('file', value)
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/upload-file`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      newQuestions[index].audio = response.data;
     }
     setQuestions(newQuestions);
   };
@@ -146,7 +154,7 @@ export default function CreateTest() {
       alert("Thời gian làm bài không hợp lệ!");
       return;
     }
-    console.log(testName, questions, timeLimit)
+
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/teacher/create-test`, // dùng chung api, chỉ khác là không gửi classId lên
       {
@@ -322,123 +330,123 @@ export default function CreateTest() {
           )}
           {(questions[activeIndex].type === "Listening" ||
             questions[activeIndex].type === "Reading") && (
-            <>
-              <Label className="block mb-2 font-medium dark:text-white">
-                {questions[activeIndex].type === "Listening"
-                  ? "Tải lên tệp âm thanh (MP3)"
-                  : "Nội dung đoạn văn"}
-              </Label>
-
-              {questions[activeIndex].type === "Listening" ? (
-                <>
-                  <FileInput
-                    accept="audio/mp3"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        updateQuestion(activeIndex, "audio", file);
-                      }
-                    }}
-                    className="mb-4"
-                  />
-
-                  {questions[activeIndex].audio && (
-                    <audio controls className="w-full mt-4">
-                      <source
-                        src={URL.createObjectURL(questions[activeIndex].audio)}
-                        type="audio/mp3"
-                      />
-                      Trình duyệt của bạn không hỗ trợ phát âm thanh.
-                    </audio>
-                  )}
-                </>
-              ) : (
-                <textarea
-                  value={questions[activeIndex].question}
-                  onChange={(e) =>
-                    updateQuestion(activeIndex, "question", e.target.value)
-                  }
-                  rows={3}
-                  className="w-full border border-gray-300 rounded px-3 py-2 mb-6 resize-none focus:outline-none focus:ring dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              )}
-
-              <div className="mb-4">
+              <>
                 <Label className="block mb-2 font-medium dark:text-white">
-                  Danh sách câu hỏi con
+                  {questions[activeIndex].type === "Listening"
+                    ? "Tải lên tệp âm thanh (MP3)"
+                    : "Nội dung đoạn văn"}
                 </Label>
-                {questions[activeIndex].subQuestions?.map((sub, subIdx) => (
-                  <div
-                    key={subIdx}
-                    className="mb-4 p-4 border rounded dark:border-gray-600"
-                  >
-                    <Label className="block mb-2 dark:text-white">
-                      Câu hỏi con {subIdx + 1}
-                    </Label>
-                    <textarea
-                      value={sub.question}
-                      onChange={(e) =>
-                        updateSubQuestion(
-                          activeIndex,
-                          subIdx,
-                          "question",
-                          e.target.value
-                        )
-                      }
-                      rows={2}
-                      className="w-full border border-gray-300 rounded px-3 py-2 mb-4 resize-none focus:outline-none focus:ring dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+
+                {questions[activeIndex].type === "Listening" ? (
+                  <>
+                    <FileInput
+                      accept="audio/mp3"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          updateQuestion(activeIndex, "audio", file);
+                        }
+                      }}
+                      className="mb-4"
                     />
 
-                    <Label className="block mb-2 dark:text-white">Đáp án</Label>
-                    {sub.choices.map((choice, choiceIdx) => (
-                      <Label
-                        key={choiceIdx}
-                        className="flex mb-2 space-x-2 dark:text-white"
-                      >
-                        <input
-                          type="radio"
-                          name={`correct-sub-answer-${activeIndex}-${subIdx}`}
-                          checked={sub.correctAnswer === choiceIdx + 1}
-                          onChange={() =>
-                            updateCorrectSubAnswer(
-                              activeIndex,
-                              subIdx,
-                              choiceIdx
-                            )
-                          }
+                    {questions[activeIndex].audio && (
+                      <audio controls className="w-full mt-4">
+                        <source
+                          src={questions[activeIndex].audio}
+                          type="audio/mp3"
                         />
-                        <Input
-                          type="text"
-                          value={choice}
-                          onChange={(e) =>
-                            updateSubQuestion(
-                              activeIndex,
-                              subIdx,
-                              "choice",
-                              e.target.value,
-                              choiceIdx
-                            )
-                          }
-                          placeholder={`Đáp án ${String.fromCharCode(
-                            65 + choiceIdx
-                          )}`}
-                          className="w-full"
-                        />
-                      </Label>
-                    ))}
-                  </div>
-                ))}
+                        Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                      </audio>
+                    )}
+                  </>
+                ) : (
+                  <textarea
+                    value={questions[activeIndex].question}
+                    onChange={(e) =>
+                      updateQuestion(activeIndex, "question", e.target.value)
+                    }
+                    rows={3}
+                    className="w-full border border-gray-300 rounded px-3 py-2 mb-6 resize-none focus:outline-none focus:ring dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  />
+                )}
 
-                <Button
-                  onClick={() => addSubQuestion(activeIndex)}
-                  className="mt-2"
-                  variant="outline"
-                >
-                  Thêm câu hỏi con
-                </Button>
-              </div>
-            </>
-          )}
+                <div className="mb-4">
+                  <Label className="block mb-2 font-medium dark:text-white">
+                    Danh sách câu hỏi con
+                  </Label>
+                  {questions[activeIndex].subQuestions?.map((sub, subIdx) => (
+                    <div
+                      key={subIdx}
+                      className="mb-4 p-4 border rounded dark:border-gray-600"
+                    >
+                      <Label className="block mb-2 dark:text-white">
+                        Câu hỏi con {subIdx + 1}
+                      </Label>
+                      <textarea
+                        value={sub.question}
+                        onChange={(e) =>
+                          updateSubQuestion(
+                            activeIndex,
+                            subIdx,
+                            "question",
+                            e.target.value
+                          )
+                        }
+                        rows={2}
+                        className="w-full border border-gray-300 rounded px-3 py-2 mb-4 resize-none focus:outline-none focus:ring dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      />
+
+                      <Label className="block mb-2 dark:text-white">Đáp án</Label>
+                      {sub.choices.map((choice, choiceIdx) => (
+                        <Label
+                          key={choiceIdx}
+                          className="flex mb-2 space-x-2 dark:text-white"
+                        >
+                          <input
+                            type="radio"
+                            name={`correct-sub-answer-${activeIndex}-${subIdx}`}
+                            checked={sub.correctAnswer === choiceIdx + 1}
+                            onChange={() =>
+                              updateCorrectSubAnswer(
+                                activeIndex,
+                                subIdx,
+                                choiceIdx
+                              )
+                            }
+                          />
+                          <Input
+                            type="text"
+                            value={choice}
+                            onChange={(e) =>
+                              updateSubQuestion(
+                                activeIndex,
+                                subIdx,
+                                "choice",
+                                e.target.value,
+                                choiceIdx
+                              )
+                            }
+                            placeholder={`Đáp án ${String.fromCharCode(
+                              65 + choiceIdx
+                            )}`}
+                            className="w-full"
+                          />
+                        </Label>
+                      ))}
+                    </div>
+                  ))}
+
+                  <Button
+                    onClick={() => addSubQuestion(activeIndex)}
+                    className="mt-2"
+                    variant="outline"
+                  >
+                    Thêm câu hỏi con
+                  </Button>
+                </div>
+              </>
+            )}
         </div>
       )}
 
